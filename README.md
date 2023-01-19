@@ -1,130 +1,24 @@
+REQUIRED COMPONENTS   
 
-#include <SoftwareSerial.h>
-//-----------------------------------------------------------------------------------
-//Alert reciever's phone number with country code
-const String PHONE_1 = "+9779800990088";
-const String PHONE_2 = ""; //optional
-const String PHONE_3 = ""; //optional
-//-----------------------------------------------------------------------------------
-//-----------------------------------------------------------------------------------
-#define rxPin 2
-#define txPin 3
-SoftwareSerial sim800L(rxPin,txPin);
-//-----------------------------------------------------------------------------------
-//-----------------------------------------------------------------------------------
-int Flame_sensor = 5;
-int Flame_detected;
-//-----------------------------------------------------------------------------------
-//-----------------------------------------------------------------------------------
-#define buzzer_pin 4
-//-----------------------------------------------------------------------------------
-void setup()
-{
-  //-----------------------------------------------------------------------------------
-  //Begin serial communication: Arduino IDE (Serial Monitor)
-  Serial.begin(115200);
-  
-  //-----------------------------------------------------------------------------------
-  //Begin serial communication: SIM800L
-  sim800L.begin(9600);
-  
-  //-----------------------------------------------------------------------------------
-  pinMode(Flame_sensor, INPUT);
-  
-  //-----------------------------------------------------------------------------------
-  pinMode(buzzer_pin, OUTPUT);
-  digitalWrite(buzzer_pin,LOW);
-  
-  //----------------------------------------------------------------------------------
-  Serial.println("Initializing...");
-  //Once the handshake test is successful, it will back to OK
-  sim800L.println("AT");
-  delay(1000);
-  sim800L.println("AT+CMGF=1");
-  delay(1000);
-  //-----------------------------------------------------------------------------------
-}
-void loop()
-{
-  while(sim800L.available()){
-  Serial.println(sim800L.readString());
-  }
-  
-  Flame_detected = digitalRead(Flame_sensor);
-  Serial.println(Flame_detected);
-  //delay(100);
-  //-----------------------------------------------------------------------------------
-  //The fire is detected, trigger Alarm and send sms
-  if (Flame_detected == 0)
-  {
-    digitalWrite(buzzer_pin,HIGH);
-      Serial.println("Fire detected...! take action immediately.");
-      send_multi_sms();
-      make_multi_call();
-    }
- //-----------------------------------------------------------------------------------
-  //No fire is detected, turn OFF Alarm
-  else
-  {
-    digitalWrite(buzzer_pin,LOW);
-    }
-//-----------------------------------------------------------------------------------
-}
-//-----------------------------------------------------------------------------------
-void send_multi_sms()
-{
-  if(PHONE_1 != ""){
-    Serial.print("Phone 1: ");
-    send_sms("Fire detected...! take action immediately.", PHONE_1);
-  }
-  if(PHONE_2 != ""){
-    Serial.print("Phone 2: ");
-    send_sms("Fire detected...! take action immediately.", PHONE_2);
-  }
-  if(PHONE_3 != ""){
-    Serial.print("Phone 3: ");
-    send_sms("Fire detected...! take action immediately.", PHONE_3);
-  }
-}
-//-----------------------------------------------------------------------------------
-//-----------------------------------------------------------------------------------
-void make_multi_call()
-{
-  if(PHONE_1 != ""){
-    Serial.print("Phone 1: ");
-    make_call(PHONE_1);
-  }
-  if(PHONE_2 != ""){
-    Serial.print("Phone 2: ");
-    make_call(PHONE_2);
-  }
-  if(PHONE_3 != ""){
-    Serial.print("Phone 3: ");
-    make_call(PHONE_3);
-  }
-}
-//-----------------------------------------------------------------------------------
-//-----------------------------------------------------------------------------------
-void send_sms(String text, String phone)
-{
-    Serial.println("sending sms....");
-    delay(50);
-    sim800L.print("AT+CMGF=1\r");
-    delay(1000);
-    sim800L.print("AT+CMGS=\""+phone+"\"\r");
-    delay(1000);
-    sim800L.print(text);
-    delay(100);
-    sim800L.write(0x1A); //ascii code for ctrl-26 //Serial2.println((char)26); //ascii code for ctrl-26
-    delay(5000);
-}
-//-----------------------------------------------------------------------------------
-//-----------------------------------------------------------------------------------
-void make_call(String phone)
-{
-    Serial.println("calling....");
-    sim800L.println("ATD"+phone+";");
-    delay(20000); //20 sec delay
-    sim800L.println("ATH");
-    delay(1000); //1 sec delay
-}
+SOFTWARE:
+
+1)Arduino IDE – Used for compiling and uploading code into the
+Arduino Uno board.
+
+HARDWARE:
+
+SIM800l--GSM [Global System of Mobile Phones] is used to give
+SMS alert to the client’s Phone when fire is detected to
+take necessary measures to protect themselves.
+
+Flame Sensor is used to detect the fire as soon as
+it is appeared in the Environment.
+
+Buzzer is used to give alarm as soon as the fire
+is detected in the
+Flame sensor.
+
+Arduino Uno board is used to connect all
+these components and make them work.
+Arduino Uno board is also known as
+Universal board
